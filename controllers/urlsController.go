@@ -23,6 +23,21 @@ var CreateUrl = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var shortUrl string
+	for{
+		shortUrl = utils.GenShort()
+		if url, err := models.GetByShortUrl(shortUrl); url != nil {
+			if err != nil {
+				utils.Respond(w, utils.Message(false, "Error while checking the url"))
+				return
+			}
+		}else{
+			break
+		}
+	}
+
+
+	url.ShortUrl = shortUrl
 	url.UserId = user
 	resp := url.Create()
 	utils.Respond(w, resp)

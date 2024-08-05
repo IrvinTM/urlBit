@@ -7,6 +7,7 @@ import (
 
 	"github.com/IrvinTM/urlBit/app"
 	"github.com/IrvinTM/urlBit/controllers"
+	"github.com/IrvinTM/urlBit/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -20,6 +21,8 @@ func main() {
 	router.HandleFunc("/api/urls/new", controllers.CreateUrl).Methods("POST")
 	router.HandleFunc("/api/me/urls", controllers.GetUrlsFor).Methods("GET")
 	port := os.Getenv("PORT")
+
+	fmt.Printf("the random url is %s \n", utils.GenShort())
 
 	if port == "" {
 		port = "3000"

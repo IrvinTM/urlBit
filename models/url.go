@@ -60,3 +60,12 @@ func GetUrls(user uint) ([]*Url) {
 	}
 	return urls
 }
+
+func GetByShortUrl(generatedUrl string) (*Url, error) {
+    var url Url
+    err := GetDB().Where("short_url = ?", generatedUrl).First(&url).Error
+    if err != nil {
+        return nil, err
+    }
+    return &url, nil
+}
