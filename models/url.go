@@ -69,3 +69,12 @@ func GetByShortUrl(generatedUrl string) (*Url, error) {
     }
     return &url, nil
 }
+
+func GetByRegularUrl(regularUrl string) (*Url, error){
+	var url Url
+	err  := GetDB().Where("address = ?", regularUrl ).First(&url).Error
+	if err != nil {
+		return nil, err
+	}
+	return &url, nil
+}

@@ -36,6 +36,14 @@ var CreateUrl = func(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+	if url1, err := models.GetByRegularUrl(url.Address); url1 != nil {
+		if err != nil {
+
+		}else{
+		utils.Respond(w, utils.Message(false, "Url already registered"))
+		return
+		}
+	}
 
 
 	url.ShortUrl = shortUrl
