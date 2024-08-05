@@ -26,6 +26,7 @@ var CreateUrl = func(w http.ResponseWriter, r *http.Request) {
 	var shortUrl string
 	for{
 		shortUrl = utils.GenShort()
+		//TODO check if the regular url already exists
 		if url, err := models.GetByShortUrl(shortUrl); url != nil {
 			if err != nil {
 				utils.Respond(w, utils.Message(false, "Error while checking the url"))
