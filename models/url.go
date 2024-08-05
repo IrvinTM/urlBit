@@ -40,15 +40,15 @@ func (url *Url) Create() (map[string] interface{}) {
 	return resp
 }
 
-func GetUrl(id uint) (*Url) {
+// func GetUrl(id uint) (*Url) {
 
-	url := &Url{}
-	err := GetDB().Table("urls").Where("id = ?", id).First(url).Error
-	if err != nil {
-		return nil
-	}
-	return url
-}
+// 	url := &Url{}
+// 	err := GetDB().Table("urls").Where("id = ?", id).First(url).Error
+// 	if err != nil {
+// 		return nil
+// 	}
+// 	return url
+// }
 
 func GetUrls(user uint) ([]*Url) {
 

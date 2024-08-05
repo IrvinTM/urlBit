@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	// "fmt"
 	"net/http"
 	"os"
@@ -14,7 +15,7 @@ import (
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		noAuth := []string{"/api/user/new", "/api/user/login"} //noauth endpoints
+		noAuth := []string{"/register", "/login"} //noauth endpoints
 		requestPath := r.URL.Path                              // current request path
 
 		// check if the req needs auth and serve it if it doesnt
@@ -49,19 +50,21 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 
 		tokenPart := splitted[1] // get the token part in the second index wich is the one we need
 		tk := &models.Token{}
+		fmt.Printf("this is the token %s",splitted[1])
 
 		token, err := jwt.ParseWithClaims(tokenPart, tk, func(t *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("token_password")), nil
 		})
 
 		if err != nil { //Malformed token, returns with http code 403 as usual
-			response = utils.Message(false, "Malformed authentication token")
+			response = utils.Message(false, "Malformed authentication token 1")
 			w.WriteHeader(http.StatusForbidden)
 			w.Header().Add("Content-Type", "application/json")
 			utils.Respond(w, response)
 			return
 		}
 
+		
 		if !token.Valid { //Token is invalid, maybe not signed on this server
 			response = utils.Message(false, "Token is not valid.")
 			w.WriteHeader(http.StatusForbidden)
