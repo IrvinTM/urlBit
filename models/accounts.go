@@ -3,6 +3,7 @@ package models
 import (
 	"os"
 	"strings"
+	"time"
 
 	"github.com/IrvinTM/urlBit/utils"
 	"github.com/dgrijalva/jwt-go"
@@ -95,11 +96,15 @@ func Login(email, password string) (map[string]interface{}) {
 	account.Password = ""
 
 	//Create JWT token
-	tk := &Token{UserId: account.ID}
-	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
-	account.Token = tokenString //Store the token in the response
-
+	tk := &Token{
+        UserId: account.ID,
+        StandardClaims: jwt.StandardClaims{
+            ExpiresAt: time.Now().Add(time.Hour * 2).Unix(), // Token expires after 2 hours
+        },
+    }
+    token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+    tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+    account.Token = tokenString //Store the token in the response
 	resp := utils.Message(true, "Logged In")
 	resp["account"] = account
 	return resp

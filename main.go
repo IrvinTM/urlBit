@@ -16,10 +16,12 @@ func main() {
 	router := mux.NewRouter()
 	router.Use(app.JwtAuthentication) // adding the middleware
 
-	router.HandleFunc("/register", controllers.CreateAccount).Methods("POST")
-	router.HandleFunc("/login", controllers.Authenticate).Methods("POST")
-	router.HandleFunc("/newurl", controllers.CreateUrl).Methods("POST")
-	router.HandleFunc("/myurls", controllers.GetUrlsFor).Methods("GET")
+	router.HandleFunc("/api/register", controllers.CreateAccount).Methods("POST")
+	router.HandleFunc("/api/login", controllers.Authenticate).Methods("POST")
+	router.HandleFunc("/api/newurl", controllers.CreateUrl).Methods("POST")
+	router.HandleFunc("/api/myurls", controllers.GetUrlsFor).Methods("GET")
+	router.HandleFunc("/{shorturl}", controllers.Redirect).Methods("GET")
+
 	port := os.Getenv("PORT")
 
 	fmt.Printf("the random url is %s \n", utils.GenShort())

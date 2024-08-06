@@ -3,11 +3,9 @@ package app
 import (
 	"context"
 	"fmt"
-	// "fmt"
 	"net/http"
 	"os"
 	"strings"
-
 	"github.com/IrvinTM/urlBit/models"
 	"github.com/IrvinTM/urlBit/utils"
 	"github.com/dgrijalva/jwt-go"
@@ -15,7 +13,7 @@ import (
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		noAuth := []string{"/register", "/login"} //noauth endpoints
+		noAuth := []string{"/api/register", "/api/login", "/{shorturl}"} //noauth endpoints
 		requestPath := r.URL.Path                              // current request path
 
 		// check if the req needs auth and serve it if it doesnt
