@@ -23,7 +23,11 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 				return
 			}
 		}
-
+		//if it is a short url 
+		if strings.HasPrefix(requestPath, "/") && len(strings.Split(requestPath, "/")) == 2 {
+            next.ServeHTTP(w, r)
+            return
+        }
 		// if we require auth we continue the execution
 
 		response := make(map[string]interface{})     // i may not need this one
