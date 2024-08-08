@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/IrvinTM/urlBit/models"
 	"github.com/IrvinTM/urlBit/utils"
@@ -16,6 +17,11 @@ var CreateUrl = func(w http.ResponseWriter, r *http.Request) {
 	url := &models.Url{}
 
 	err := json.NewDecoder(r.Body).Decode(url)
+	if !strings.HasPrefix(url.Address, "http://") || !strings.HasPrefix(url.Address, "https://") {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.Respond(w, utils.Message(false, "Invalid url"))
+		return
+	}
 	if err != nil {
 		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
 		return
@@ -27,6 +33,7 @@ var CreateUrl = func(w http.ResponseWriter, r *http.Request) {
 		//TODO check if the regular url already exists
 		if url, err := models.GetByShortUrl(shortUrl); url != nil {
 			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
 				utils.Respond(w, utils.Message(false, "Error while checking the url"))
 				return
 			}

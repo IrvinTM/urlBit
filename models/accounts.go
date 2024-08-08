@@ -99,7 +99,7 @@ func Login(email, password string) (map[string]interface{}) {
 	tk := &Token{
         UserId: account.ID,
         StandardClaims: jwt.StandardClaims{
-            ExpiresAt: time.Now().Add(time.Hour * 2).Unix(), // Token expires after 2 hours
+            ExpiresAt: time.Now().Add(time.Minute * 2).Unix(), // Token expires after 2 hours
         },
     }
     token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)

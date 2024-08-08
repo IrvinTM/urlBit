@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -52,7 +51,6 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 
 		tokenPart := splitted[1] // get the token part in the second index wich is the one we need
 		tk := &models.Token{}
-		fmt.Printf("this is the token %s",splitted[1])
 
 		token, err := jwt.ParseWithClaims(tokenPart, tk, func(t *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("token_password")), nil
