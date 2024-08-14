@@ -33,5 +33,4 @@ func main() {
 	if err != nil {
 		fmt.Printf("\nThere was an error\n %v", err)
 	}
-
 }

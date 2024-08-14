@@ -2,18 +2,20 @@ package models
 
 import (
 	"fmt"
+
 	"github.com/IrvinTM/urlBit/utils"
 	"github.com/jinzhu/gorm"
 )
 
 type Url struct {
 	gorm.Model
-	Address   string    `json:"address"`
-	ShortUrl  string    `json:"short_url"`
-	UserId    uint      `json:"user_id"`
+	Address  string `json:"address"`
+	ShortUrl string `json:"short_url"`
+	UserId   uint   `json:"user_id"`
+	Clicks   int    `json:"clicks"`
 }
 
-func (url *Url) Validate() (map[string] interface{}, bool) {
+func (url *Url) Validate() (map[string]interface{}, bool) {
 
 	if url.Address == "" {
 		return utils.Message(false, "url  should be on the payload"), false
@@ -27,7 +29,7 @@ func (url *Url) Validate() (map[string] interface{}, bool) {
 	return utils.Message(true, "success"), true
 }
 
-func (url *Url) Create() (map[string] interface{}) {
+func (url *Url) Create() map[string]interface{} {
 
 	if resp, ok := url.Validate(); !ok {
 		return resp
@@ -50,7 +52,7 @@ func (url *Url) Create() (map[string] interface{}) {
 // 	return url
 // }
 
-func GetUrls(user uint) ([]*Url) {
+func GetUrls(user uint) []*Url {
 
 	urls := make([]*Url, 0)
 	err := GetDB().Table("urls").Where("user_id = ?", user).Find(&urls).Error
@@ -62,19 +64,31 @@ func GetUrls(user uint) ([]*Url) {
 }
 
 func GetByShortUrl(generatedUrl string) (*Url, error) {
-    var url Url
-    err := GetDB().Where("short_url = ?", generatedUrl).First(&url).Error
-    if err != nil {
-        return nil, err
-    }
-    return &url, nil
-}
-
-func GetByRegularUrl(regularUrl string) (*Url, error){
 	var url Url
-	err  := GetDB().Where("address = ?", regularUrl ).First(&url).Error
+	err := GetDB().Where("short_url = ?", generatedUrl).First(&url).Error
 	if err != nil {
 		return nil, err
 	}
 	return &url, nil
+}
+
+func GetByRegularUrl(regularUrl string) (*Url, error) {
+	var url Url
+	err := GetDB().Where("address = ?", regularUrl).First(&url).Error
+	if err != nil {
+		return nil, err
+	}
+	return &url, nil
+}
+
+func UpdateUrl(url *Url) error {
+	db := GetDB()
+
+	newclickCount := url.Clicks + 1
+	// Perform the update and check for errors
+	if err := db.Model(&url).Where("address = ?", url.Address).Update("clicks", newclickCount).Error; err != nil {
+		fmt.Printf("Error updating URL: %v", err)
+		return err
+	}
+	return nil
 }
