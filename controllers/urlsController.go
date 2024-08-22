@@ -92,3 +92,48 @@ var Redirect = func(w http.ResponseWriter, r *http.Request) {
 	// Redirect the user to the original URL
 	http.Redirect(w, r, url.Address, http.StatusMovedPermanently)
 }
+
+var CreateFreeUrl = func(w http.ResponseWriter, r *http.Request) {
+
+	var user uint = 1
+	url := &models.Url{}
+
+	err := json.NewDecoder(r.Body).Decode(url)
+	if !strings.HasPrefix(url.Address, "http://") && !strings.HasPrefix(url.Address, "https://") {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.Respond(w, utils.Message(false, "Invalid url"))
+		return
+	}
+	if err != nil {
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	var shortUrl string
+	for {
+		shortUrl = utils.GenShort()
+		//TODO check if the regular url already exists
+		if url, err := models.GetByShortUrl(shortUrl); url != nil {
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				utils.Respond(w, utils.Message(false, "Error while checking the url"))
+				return
+			}
+		} else {
+			break
+		}
+	}
+	if url1, err := models.GetByRegularUrl(url.Address); url1 != nil {
+		if err != nil {
+		} else {
+			utils.Respond(w, utils.Message(false, "Url already registered"))
+			return
+		}
+	}
+
+	url.ShortUrl = shortUrl
+	url.UserId = user
+	url.Clicks = 0
+	resp := url.Create()
+	utils.Respond(w, resp)
+}
