@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-
 	"github.com/IrvinTM/urlBit/models"
 	"github.com/IrvinTM/urlBit/utils"
 )

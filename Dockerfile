@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y git
 WORKDIR /api
 
 # Clone the repository
-RUN git clone https://github.com/IrvinTM/urlBit.git --depth 1 .
+RUN git clone -b test https://github.com/IrvinTM/urlBit.git --depth 1 .
 
 # Build the Go application
 RUN go build -o urlBit .
