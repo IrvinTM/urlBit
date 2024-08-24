@@ -12,7 +12,7 @@ import (
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		noAuth := []string{"/api/register", "/api/login", "/{shorturl}"} //noauth endpoints
+		noAuth := []string{"/api/register", "/api/login", "/{shorturl}", "/api/freeurl"} //noauth endpoints
 		requestPath := r.URL.Path                              // current request path
 
 		// check if the req needs auth and serve it if it doesnt
