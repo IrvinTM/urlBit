@@ -30,6 +30,6 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "80:80"
+      - "8097:8097"
     environment:
       - NODE_ENV=production
