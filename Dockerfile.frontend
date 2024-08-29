@@ -1,13 +1,11 @@
-# Use a node image as base
 FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Clone the frontend repository
-RUN apk add --no-cache git && \
-    git clone https://github.com/IrvinTM/urlBitFront.git . && \
+RUN apk add git && \
+    git clone https://github.com/IrvinTM/urlBitFront.git --depth 1 . && \
     npm install
 
-# Start Vite
-CMD ["npm", "run", "dev"]
+EXPOSE 5173
+
+CMD [ "npm", "run", "dev" ]
