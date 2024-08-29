@@ -11,20 +11,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Token struct{
+type Token struct {
 	UserId uint
 	jwt.StandardClaims
 }
 
 type Account struct {
 	gorm.Model
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
-	Token string `json:"token" sql:"-"`
+	Token    string `json:"token" sql:"-"`
 }
 
-//Validate incoming user details...
-func (account *Account) Validate() (map[string] interface{}, bool) {
+// Validate incoming user details...
+func (account *Account) Validate() (map[string]interface{}, bool) {
 
 	if !strings.Contains(account.Email, "@") {
 		return utils.Message(false, "Email address is required"), false
@@ -49,7 +50,7 @@ func (account *Account) Validate() (map[string] interface{}, bool) {
 	return utils.Message(false, "Requirement passed"), true
 }
 
-func (account *Account) Create() (map[string] interface{}) {
+func (account *Account) Create() map[string]interface{} {
 
 	if resp, ok := account.Validate(); !ok {
 		return resp
@@ -77,7 +78,7 @@ func (account *Account) Create() (map[string] interface{}) {
 	return response
 }
 
-func Login(email, password string) (map[string]interface{}) {
+func Login(email, password string) map[string]interface{} {
 
 	account := &Account{}
 	err := GetDB().Table("accounts").Where("email = ?", email).First(account).Error
@@ -97,14 +98,14 @@ func Login(email, password string) (map[string]interface{}) {
 
 	//Create JWT token
 	tk := &Token{
-        UserId: account.ID,
-        StandardClaims: jwt.StandardClaims{
-            ExpiresAt: time.Now().Add(time.Hour).Unix(), // Token expires after 1 hours
-        },
-    }
-    token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-    tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
-    account.Token = tokenString //Store the token in the response
+		UserId: account.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour).Unix(), // Token expires after 1 hours
+		},
+	}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+	account.Token = tokenString //Store the token in the response
 	resp := utils.Message(true, "Logged In")
 	resp["account"] = account
 	return resp
