@@ -16,6 +16,7 @@ var CORSMiddleware = func(next http.Handler) http.Handler {
             "http://archbthw.site",
             "https://archbthw.site",
             "http://localhost:80",
+            "http://localhost:3000",
         }
 
         origin := r.Header.Get("Origin")
