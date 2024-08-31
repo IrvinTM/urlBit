@@ -10,10 +10,22 @@ import (
     "github.com/dgrijalva/jwt-go"
 )
 
-// CORS middleware
 var CORSMiddleware = func(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        w.Header().Set("Access-Control-Allow-Origin", "*")
+        allowedOrigins := []string{
+            "http://archbthw.site",
+            "https://archbthw.site",
+            "http://localhost:80",
+        }
+
+        origin := r.Header.Get("Origin")
+        for _, allowedOrigin := range allowedOrigins {
+            if origin == allowedOrigin {
+                w.Header().Set("Access-Control-Allow-Origin", origin)
+                break
+            }
+        }
+
         w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
@@ -26,6 +38,7 @@ var CORSMiddleware = func(next http.Handler) http.Handler {
         next.ServeHTTP(w, r)
     })
 }
+
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
