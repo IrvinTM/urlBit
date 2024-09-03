@@ -24,12 +24,3 @@ services:
       POSTGRES_PASSWORD: examplepassword123
     ports:
       - "5432:5432"
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    ports:
-      - "80:80"
-    environment:
-      - NODE_ENV=production
