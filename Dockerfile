@@ -12,8 +12,5 @@ RUN git clone https://github.com/IrvinTM/urlBit.git --depth 1 .
 # Build the Go application
 RUN go build -o urlBit .
 
-# Expose the port
-EXPOSE 3000
-
 # Command to run the application
 CMD ["./urlBit"]
