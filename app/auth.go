@@ -13,7 +13,12 @@ import (
 var CORSMiddleware = func(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         allowedOrigins := []string{
-            "https://shortener.archbthw.site",
+            "https://shortener.archbthw.site/api/register",
+            "https://shortener.archbthw.site/api/login",
+            "https://shortener.archbthw.site/api/newurl",
+            "https://shortener.archbthw.site/api/{shorturl}",
+            "https://shortener.archbthw.site/api/myurls",
+            "https://shortener.archbthw.site/api/freeurl",
             "http://localhost:5173",
         }
 
