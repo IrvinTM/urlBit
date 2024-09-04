@@ -13,7 +13,7 @@ import (
 var CORSMiddleware = func(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         allowedOrigins := []string{
-            "https://shortener.archbtw.site/",
+            "https://shortener.archbtw.site",
             "http://localhost:5173",
         }
 
@@ -27,6 +27,7 @@ var CORSMiddleware = func(next http.Handler) http.Handler {
 
         w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        w.Header().Set("Access-Control-Allow-Credentials", "true")
 
         // If it's a preflight request, return 200
         if r.Method == http.MethodOptions {
@@ -38,32 +39,37 @@ var CORSMiddleware = func(next http.Handler) http.Handler {
     })
 }
 
+type contextKey string
+
+func (c contextKey) String() string {
+    return "app context key " + string(c)
+}
+
+const userKey = contextKey("user")
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        noAuth := []string{"/api/register", "/api/login", "/{shorturl}", "/api/freeurl"} //noauth endpoints
+        noAuth := []string{"/api/register", "/api/login", "/{shorturl}", "/api/freeurl"} // no-auth endpoints
         requestPath := r.URL.Path                              // current request path
 
-        // check if the req needs auth and serve it if it doesnt
+        // check if the req needs auth and serve it if it doesn't
         for _, value := range noAuth {
             if value == requestPath {
                 next.ServeHTTP(w, r)
                 return
             }
         }
-        //if it is a short url 
+        // if it is a short url
         if strings.HasPrefix(requestPath, "/") && len(strings.Split(requestPath, "/")) == 2 {
             next.ServeHTTP(w, r)
             return
         }
-        // if we require auth we continue the execution
 
-        response := make(map[string]interface{})     // i may not need this one
+        // Handle JWT auth
         tokenHeader := r.Header.Get("Authorization") // get the token from the request header
 
-        //check if the token is empty and if it is "" return 403
         if tokenHeader == "" {
-            response = utils.Message(false, "Invalid or malformed auth token")
+            response := utils.Message(false, "Missing or malformed auth token")
             w.WriteHeader(http.StatusForbidden)
             w.Header().Add("Content-Type", "application/json")
             utils.Respond(w, response)
@@ -72,38 +78,29 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 
         splitted := strings.Split(tokenHeader, " ")
         if len(splitted) != 2 {
-            response = utils.Message(false, "Invalid or malformed auth token")
+            response := utils.Message(false, "Invalid or malformed auth token")
             w.Header().Add("Content-Type", "application/json")
             utils.Respond(w, response)
             return
         }
 
-        tokenPart := splitted[1] // get the token part in the second index wich is the one we need
+        tokenPart := splitted[1]
         tk := &models.Token{}
 
         token, err := jwt.ParseWithClaims(tokenPart, tk, func(t *jwt.Token) (interface{}, error) {
             return []byte(os.Getenv("token_password")), nil
         })
 
-        if err != nil { //Malformed token, returns with http code 403 as usual
-            response = utils.Message(false, "Malformed authentication token 1")
+        if err != nil || !token.Valid {
+            response := utils.Message(false, "Malformed or expired authentication token")
             w.WriteHeader(http.StatusForbidden)
             w.Header().Add("Content-Type", "application/json")
             utils.Respond(w, response)
             return
         }
 
-        
-        if !token.Valid { //Token is invalid, maybe not signed on this server
-            response = utils.Message(false, "Token is not valid.")
-            w.WriteHeader(http.StatusForbidden)
-            w.Header().Add("Content-Type", "application/json")
-            utils.Respond(w, response)
-            return
-        }
-        //Everything went well, proceed with the request and set the caller to the user retrieved from the parsed token
-        // fmt.Sprintf("User %v", tk.UserId)
-        ctx := context.WithValue(r.Context(), "user", tk.UserId)
+        // Set the user in context
+        ctx := context.WithValue(r.Context(), userKey, tk.UserId)
         r = r.WithContext(ctx)
         next.ServeHTTP(w, r)
     })
