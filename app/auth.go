@@ -1,13 +1,15 @@
 package app
 
 import (
-    "context"
-    "net/http"
-    "os"
-    "strings"
-    "github.com/IrvinTM/urlBit/models"
-    "github.com/IrvinTM/urlBit/utils"
-    "github.com/dgrijalva/jwt-go"
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"strings"
+
+	"github.com/IrvinTM/urlBit/models"
+	"github.com/IrvinTM/urlBit/utils"
+	"github.com/dgrijalva/jwt-go"
 )
 
 var CORSMiddleware = func(next http.Handler) http.Handler {
@@ -23,6 +25,7 @@ var CORSMiddleware = func(next http.Handler) http.Handler {
         }
 
         origin := r.Header.Get("Origin")
+        fmt.Printf("this is the origin :%v",origin)
         for _, allowedOrigin := range allowedOrigins {
             if origin == allowedOrigin {
                 w.Header().Set("Access-Control-Allow-Origin", origin)
