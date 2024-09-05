@@ -18,6 +18,7 @@ var CORSMiddleware = func(next http.Handler) http.Handler {
             "http://localhost:80",
             "http://localhost:2323",
             "https://archbtw.site",
+            "http://localhost:3000",
 
         }
 
