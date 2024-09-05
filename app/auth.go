@@ -14,7 +14,11 @@ var CORSMiddleware = func(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         allowedOrigins := []string{
             "https://shortener.archbtw.site",
-            "http://localhost:5173",
+            "http://localhost:2323",
+            "http://localhost:80",
+            "http://localhost:2323",
+            "https://archbtw.site",
+
         }
 
         origin := r.Header.Get("Origin")
